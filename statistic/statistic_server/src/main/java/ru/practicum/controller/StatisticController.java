@@ -16,6 +16,7 @@ import java.util.List;
 @Slf4j
 public class StatisticController {
     private final StatisticService service;
+
     @PostMapping("/hit")
     @ResponseStatus(code = HttpStatus.CREATED)
     public void saveStatisticInformation(@RequestBody StatisticInfoDto statisticInfoDto) {

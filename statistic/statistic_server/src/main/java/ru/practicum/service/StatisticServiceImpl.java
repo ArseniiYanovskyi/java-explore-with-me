@@ -14,8 +14,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StatisticServiceImpl implements StatisticService{
+public class StatisticServiceImpl implements StatisticService {
     private final EndpointHitRepository repository;
+
     @Override
     @Transactional
     public void saveStatisticInfo(StatisticInfoDto statisticInfoDto) {
@@ -29,10 +30,8 @@ public class StatisticServiceImpl implements StatisticService{
     public List<StatisticAnswerDto> getStatisticInfoByParameters(StatisticRequestDto statisticRequestDto) {
         log.info("Sending to dao request to get statistic information.");
         if (statisticRequestDto.getUnique()) {
-            return repository.getUniqueIpStatistic
-                    (statisticRequestDto.getUris(), statisticRequestDto.getStart(), statisticRequestDto.getEnd());
+            return repository.getUniqueIpStatistic(statisticRequestDto.getUris(), statisticRequestDto.getStart(), statisticRequestDto.getEnd());
         }
-        return repository.getStatistic
-                (statisticRequestDto.getUris(), statisticRequestDto.getStart(), statisticRequestDto.getEnd());
+        return repository.getStatistic(statisticRequestDto.getUris(), statisticRequestDto.getStart(), statisticRequestDto.getEnd());
     }
 }

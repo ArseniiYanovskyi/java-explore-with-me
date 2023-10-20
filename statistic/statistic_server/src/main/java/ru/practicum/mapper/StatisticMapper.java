@@ -20,8 +20,7 @@ public class StatisticMapper {
                 .build();
     }
 
-    public static StatisticRequestDto createStatisticRequestDto
-            (String start, String end, List<String> uris, Boolean unique) {
+    public static StatisticRequestDto createStatisticRequestDto(String start, String end, List<String> uris, Boolean unique) {
         return StatisticRequestDto.builder()
                 .start(LocalDateTime.parse(start, formatter))
                 .end(LocalDateTime.parse(end, formatter))

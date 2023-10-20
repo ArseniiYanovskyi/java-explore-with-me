@@ -69,7 +69,7 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         return returningList;
     }
 
-    private StatisticAnswerDto makeAnswer(ResultSet rs){
+    private StatisticAnswerDto makeAnswer(ResultSet rs) {
         try {
             return StatisticAnswerDto.builder()
                     .app(rs.getString("app"))
