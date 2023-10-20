@@ -6,7 +6,7 @@ import ru.practicum.model.EndpointHit;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EndpointHitRepository{
+public interface EndpointHitRepository {
 
     void saveStatisticInfo(EndpointHit endpointHit);
 
