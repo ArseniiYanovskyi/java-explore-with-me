@@ -1,8 +1,8 @@
 version: '3.1'
 services:
-  statistic_server:
+  statistic-server:
     build: statistic/statistic_server
-    container_name: statistic_server
+    container_name: statistic-server
     ports:
       - "9090:9090"
     depends_on:
@@ -32,6 +32,7 @@ services:
       - ewm_db
     environment:
       - EXPLORE_WITH_ME_SERVER_PORT=8080
+      - STATISTIC_SERVER_URL=http://statistic-server:9090
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm_db:5432/Service_EWM
       - SPRING_DATASOURCE_USERNAME=user
       - SPRINT_DATASOURCE_PASSWORD=password
