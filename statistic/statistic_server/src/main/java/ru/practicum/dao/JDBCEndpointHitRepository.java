@@ -63,7 +63,7 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         }
 
         return returningList.stream()
-                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits))
+                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -90,7 +90,7 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         }
 
         return returningList.stream()
-                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits))
+                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits).reversed())
                 .collect(Collectors.toList());
     }
 
