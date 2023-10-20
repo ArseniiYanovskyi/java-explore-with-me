@@ -2,13 +2,10 @@ package ru.practicum.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.practicum.dto.StatisticAnswerDto;
-import ru.practicum.dto.StatisticInfoDto;
 import ru.practicum.model.EndpointHit;
 
 import java.sql.PreparedStatement;

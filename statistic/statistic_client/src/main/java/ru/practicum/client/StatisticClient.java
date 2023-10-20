@@ -48,20 +48,21 @@ public class StatisticClient {
 
         return responseBuilder.build();
     }
+
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
-        ResponseEntity<Object> StatisticServerResponse;
+        ResponseEntity<Object> statisticServerResponse;
         try {
             if (parameters != null) {
-                StatisticServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+                statisticServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
             } else {
-                StatisticServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+                statisticServerResponse = rest.exchange(path, method, requestEntity, Object.class);
             }
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }
-        return prepareStatisticResponse(StatisticServerResponse);
+        return prepareStatisticResponse(statisticServerResponse);
     }
 
     private HttpHeaders defaultHeaders() {
