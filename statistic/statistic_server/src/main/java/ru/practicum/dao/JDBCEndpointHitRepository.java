@@ -14,7 +14,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -60,7 +62,9 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
                     Timestamp.valueOf(start), Timestamp.valueOf(end)));
         }
 
-        return returningList;
+        return returningList.stream()
+                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits))
+                .collect(Collectors.toList());
     }
 
     @Override    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
@@ -85,7 +89,9 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
                     Timestamp.valueOf(start), Timestamp.valueOf(end)));
         }
 
-        return returningList;
+        return returningList.stream()
+                .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits))
+                .collect(Collectors.toList());
     }
 
     private StatisticAnswerDto makeAnswer(ResultSet rs) {
