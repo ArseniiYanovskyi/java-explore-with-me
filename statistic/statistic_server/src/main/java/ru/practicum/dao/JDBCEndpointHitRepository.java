@@ -49,7 +49,6 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
             return jdbcTemplate.query(sqlQueryWithoutUris, (rs, rowNum) -> makeAnswer(rs),
                     Timestamp.valueOf(start), Timestamp.valueOf(end));
         }
-
         List<StatisticAnswerDto> returningList = new ArrayList<>();
         final String sqlQuery = "SELECT app, uri, COUNT(ip) AS hits " +
                 "FROM endpointhits " +
@@ -74,7 +73,6 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
             return jdbcTemplate.query(sqlQueryWithoutUris, (rs, rowNum) -> makeAnswer(rs),
                     Timestamp.valueOf(start), Timestamp.valueOf(end));
         }
-        
         List<StatisticAnswerDto> returningList = new ArrayList<>();
         final String sqlQueryByUris = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
                 "FROM endpointhits " +
