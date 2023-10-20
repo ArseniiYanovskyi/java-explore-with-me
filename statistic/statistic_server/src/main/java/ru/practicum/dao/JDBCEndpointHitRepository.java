@@ -40,12 +40,22 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
 
     @Override
     public List<StatisticAnswerDto> getStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
+        if (uris.isEmpty()) {
+            String sqlQueryWithoutUris = "SELECT app, uri, COUNT(ip) AS hits " +
+                    "FROM endpointhits " +
+                    "WHERE timestamp > ? AND timestamp < ? " +
+                    "GROUP BY uri, app " +
+                    "ORDER BY COUNT(ip) DESC";
+            return jdbcTemplate.query(sqlQueryWithoutUris, (rs, rowNum) -> makeAnswer(rs),
+                    Timestamp.valueOf(start), Timestamp.valueOf(end));
+        }
+
         List<StatisticAnswerDto> returningList = new ArrayList<>();
         final String sqlQuery = "SELECT app, uri, COUNT(ip) AS hits " +
                 "FROM endpointhits " +
                 "WHERE uri LIKE ? AND timestamp > ? AND timestamp < ? " +
                 "GROUP BY uri, app " +
-                "ORDER BY COUNT(ip)";
+                "ORDER BY COUNT(ip) DESC";
         for (String uri : uris) {
             returningList.addAll(jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeAnswer(rs), uri,
                     Timestamp.valueOf(start), Timestamp.valueOf(end)));
@@ -55,14 +65,25 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
     }
 
     @Override    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
+        if (uris.isEmpty()) {
+            String sqlQueryWithoutUris = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
+                    "FROM endpointhits " +
+                    "WHERE timestamp > ? AND timestamp < ? " +
+                    "GROUP BY uri, app " +
+                    "ORDER BY COUNT(DISTINCT(ip)) DESC";
+            return jdbcTemplate.query(sqlQueryWithoutUris, (rs, rowNum) -> makeAnswer(rs),
+                    Timestamp.valueOf(start), Timestamp.valueOf(end));
+        }
+        
         List<StatisticAnswerDto> returningList = new ArrayList<>();
-        final String sqlQuery = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
+        final String sqlQueryByUris = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
                 "FROM endpointhits " +
                 "WHERE uri LIKE ? AND timestamp > ? AND timestamp < ? " +
                 "GROUP BY uri, app " +
-                "ORDER BY COUNT(DISTINCT(ip))";
+                "ORDER BY COUNT(DISTINCT(ip)) DESC";
+
         for (String uri : uris) {
-            returningList.addAll(jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeAnswer(rs), uri,
+            returningList.addAll(jdbcTemplate.query(sqlQueryByUris, (rs, rowNum) -> makeAnswer(rs), uri,
                     Timestamp.valueOf(start), Timestamp.valueOf(end)));
         }
 

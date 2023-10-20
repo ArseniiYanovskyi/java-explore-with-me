@@ -6,6 +6,7 @@ import ru.practicum.model.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StatisticMapper {
@@ -21,6 +22,9 @@ public class StatisticMapper {
     }
 
     public static StatisticRequestDto createStatisticRequestDto(String start, String end, List<String> uris, Boolean unique) {
+        if (uris == null) {
+            uris = new ArrayList<>();
+        }
         return StatisticRequestDto.builder()
                 .start(LocalDateTime.parse(start, formatter))
                 .end(LocalDateTime.parse(end, formatter))

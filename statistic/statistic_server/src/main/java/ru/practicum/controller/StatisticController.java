@@ -28,7 +28,7 @@ public class StatisticController {
     @GetMapping("/stats")
     @ResponseStatus(code = HttpStatus.OK)
     public List<StatisticAnswerDto> getStatisticInformation(@RequestParam String start, @RequestParam String end,
-            @RequestParam List<String> uris, @RequestParam(defaultValue = "false") Boolean unique) {
+            @RequestParam(required = false) List<String> uris, @RequestParam(defaultValue = "false") Boolean unique) {
         log.info("Received request to get statistic from {} to {} to URI: {} should be counted with unique IP: {}.",
                 start, end, uris, unique);
 
