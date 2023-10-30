@@ -67,7 +67,8 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
                 .collect(Collectors.toList());
     }
 
-    @Override    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
+    @Override
+    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
         if (uris.isEmpty()) {
             String sqlQueryWithoutUris = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
                     "FROM endpointhits " +
