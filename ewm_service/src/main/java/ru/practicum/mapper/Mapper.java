@@ -6,7 +6,9 @@ import ru.practicum.model.event.Event;
 import ru.practicum.model.event.Location;
 import ru.practicum.model.event.State;
 import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
+import ru.practicum.model.event.dto.UpdateEventUserRequest;
 import ru.practicum.model.request.Request;
 import ru.practicum.model.request.Status;
 import ru.practicum.model.request.dto.ParticipationRequestDto;
@@ -84,7 +86,7 @@ public class Mapper {
                 .categoryDto(convertCategoryToDto(event.getCategory()))
                 .initiator(convertUserToShortDto(event.getInitiator()))
                 .createdOn(event.getCreatedOn().format(formatter))
-                .publishedOn(event.getPublished().format(formatter))
+                .publishedOn(event.getPublishedTime().format(formatter))
                 .eventDate(event.getEventDate().format(formatter))
                 .location(new Location(event.getLatitude(), event.getLongitude()))
                 .paid(event.isPaid())
@@ -96,12 +98,26 @@ public class Mapper {
                 .build();
     }
 
-    public static Request createRequest(User user, Event event, Status status) {
+    public static EventShortDto convertEventToShortDto(Event event) {
+        return EventShortDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .title(event.getTitle())
+                .categoryDto(convertCategoryToDto(event.getCategory()))
+                .initiator(convertUserToShortDto(event.getInitiator()))
+                .eventDate(event.getEventDate().format(formatter))
+                .paid(event.isPaid())
+                .confirmedRequests(event.getConfirmedRequests())
+                .views(event.getViews())
+                .build();
+    }
+
+    public static Request createRequest(User user, Event event) {
         return Request.builder()
                 .requester(user)
                 .event(event)
                 .created(LocalDateTime.now())
-                .status(status)
+                .status(Status.PENDING)
                 .build();
     }
 

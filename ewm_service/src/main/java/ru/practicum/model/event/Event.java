@@ -6,12 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.beans.factory.annotation.Value;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -51,8 +51,8 @@ public class Event {
     private int participantLimit;
     @Column(name = "created_on")
     private LocalDateTime createdOn;
-    @Column(name = "published")
-    private LocalDateTime published;
+    @Column(name = "published_time")
+    private LocalDateTime publishedTime;
     @Column(name = "paid", nullable = false)
     private boolean paid;
     @Column(name = "request_moderation", nullable = false)

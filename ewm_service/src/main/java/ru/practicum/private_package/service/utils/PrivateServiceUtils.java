@@ -8,9 +8,12 @@ import ru.practicum.dao.UserRepository;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.event.Event;
+import ru.practicum.model.event.State;
 import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.NewEventDto;
+import ru.practicum.model.event.dto.StateAction;
 import ru.practicum.model.event.dto.UpdateEventUserRequest;
+import ru.practicum.model.exception.IncorrectRequestException;
 import ru.practicum.model.exception.NotFoundException;
 import ru.practicum.model.request.Request;
 import ru.practicum.model.request.Status;
@@ -31,6 +34,9 @@ public class PrivateServiceUtils {
     private final EventRepository eventRepository;
 
     public Event convertEventFromNewDto(NewEventDto newEventDto, long userId) {
+        if (LocalDateTime.parse(newEventDto.getEventDate(), Mapper.formatter).isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new IncorrectRequestException("Time of new event can't be earlier than 2 hours later.");
+        }
         Category eventCategory = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("Category with id " + newEventDto.getCategory() + " does not present in repository."));
         User initiator = userRepository.findById(userId)
@@ -56,11 +62,13 @@ public class PrivateServiceUtils {
     }
 
     public Event updateEventObject(Event event, UpdateEventUserRequest updateEventUserRequest) {
+        if (LocalDateTime.parse(updateEventUserRequest.getEventDate(), Mapper.formatter).isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new IncorrectRequestException("Time of updated by owner event can't be earlier than 2 hours later.");
+        }
         if (updateEventUserRequest.getCategory() != null && updateEventUserRequest.getCategory() != 0) {
             Category newCategory = categoryRepository.findById(updateEventUserRequest.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category with id " + updateEventUserRequest.getCategory() + " does not present in repository."));
             event.setCategory(newCategory);
-
         }
         if(updateEventUserRequest.getAnnotation() != null && !updateEventUserRequest.getAnnotation().isBlank()) {
             event.setAnnotation(updateEventUserRequest.getAnnotation());
@@ -87,16 +95,22 @@ public class PrivateServiceUtils {
         if (updateEventUserRequest.getRequestModeration() != null) {
             event.setRequestModeration(updateEventUserRequest.getRequestModeration());
         }
-        if (updateEventUserRequest.getStateAction() != null) {
-            //TODO
+        if (event.getState().equals(State.PENDING) && updateEventUserRequest.getStateAction().equals(StateAction.CANCEL_REVIEW)) {
+            event.setState(State.CANCELED);
+        } else if (event.getState().equals(State.CANCELED) && updateEventUserRequest.getStateAction().equals(StateAction.SEND_TO_REVIEW)) {
+            event.setState(State.PENDING);
         }
         return event;
     }
 
-    public Request createRequest(long requesterId, Event event, Status status) {
+    public Request createRequest(long requesterId, long eventId) {
         return Mapper.createRequest(userRepository.findById(requesterId)
                 .orElseThrow(() -> new NotFoundException("User with id " + requesterId + " does not present in repository.")),
-                event, status);
+                eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("User with id " + eventId + " does not present in repository.")));
+    }
+
+    public ParticipationRequestDto createRequestDto(Request request) {
+        return Mapper.createParticipationRequestDto(request);
     }
 
     public EventRequestStatusUpdateResult createRequestsResultDto(List<Request> requestList) {
@@ -116,5 +130,11 @@ public class PrivateServiceUtils {
         return requestList.stream()
                 .map(Mapper::createParticipationRequestDto)
                 .collect(Collectors.toList());
+    }
+
+    public void checkIsUserPresent(long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not present in repository.");
+        }
     }
 }

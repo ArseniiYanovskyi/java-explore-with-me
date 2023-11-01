@@ -14,7 +14,7 @@ public class EventShortDto {
     private CategoryDto categoryDto;
     private UserShortDto initiator;
     private String eventDate;
-    private boolean paid;
-    private int confirmedRequests;
-    private int views;
+    private Boolean paid;
+    private Integer confirmedRequests;
+    private Integer views;
 }

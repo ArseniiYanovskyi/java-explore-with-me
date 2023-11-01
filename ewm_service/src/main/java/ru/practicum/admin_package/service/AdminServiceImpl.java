@@ -4,15 +4,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dao.CategoryRepository;
+import ru.practicum.dao.EventRepository;
 import ru.practicum.dao.UserRepository;
+import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.dto.CompilationDto;
+import ru.practicum.model.compilation.dto.NewCompilationDto;
+import ru.practicum.model.compilation.dto.UpdateCompilationRequest;
+import ru.practicum.model.event.Event;
+import ru.practicum.model.event.State;
+import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.event.dto.AdminEventSearchParameters;
+import ru.practicum.model.event.dto.UpdateEventAdminRequest;
+import ru.practicum.model.exception.NotFoundException;
 import ru.practicum.model.user.User;
 import ru.practicum.model.user.dto.UserDto;
 import ru.practicum.admin_package.service.utils.AdminServiceUtils;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +36,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminServiceUtils utils;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public CategoryDto addCategory(CategoryDto categoryDto) {
@@ -35,6 +50,34 @@ public class AdminServiceImpl implements AdminService {
         log.info("Sending to repository request to update category with id {} to: {}.", categoryId, categoryDto.getName());
         Category category = categoryRepository.save(utils.convertCategoryFromDto(categoryDto));
         return utils.convertCategoryToDto(category);
+    }
+
+    @Override
+    public EventFullDto updateEvent(long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
+        Event updatedEvent = utils.updateEventObject(eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " does not present in repository.")),
+                updateEventAdminRequest);
+        log.info("Sending to repository request to update event {}.", eventId);
+        return utils.convertEventToFullDto(eventRepository.save(updatedEvent));
+    }
+
+    @Override
+    public List<EventFullDto> searchEvent(AdminEventSearchParameters adminEventSearchParameters) {
+        List<Long> users = adminEventSearchParameters.getUsersIds();
+        List<State> states = adminEventSearchParameters.getStates().stream()
+                .map(State::parseState)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        if (states.size() != adminEventSearchParameters.getStates().size()) {
+            throw new NotFoundException("Some of states are unknown.");
+        }
+        List<Long> categories = adminEventSearchParameters.getCategories();
+        Timestamp start = Timestamp.valueOf(LocalDateTime.parse(adminEventSearchParameters.getRangeStart(), Mapper.formatter));
+        Timestamp end = Timestamp.valueOf(LocalDateTime.parse(adminEventSearchParameters.getRangeEnd(), Mapper.formatter));
+        log.info("Sending to repository request to find list of events by parameters.");
+        List<Event> searchResults = eventRepository.findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateIsBetween(users, states, categories, start, end);
+        return formResultForEventSearch(searchResults, adminEventSearchParameters.getFrom(), adminEventSearchParameters.getSize());
     }
 
     @Override
@@ -66,6 +109,21 @@ public class AdminServiceImpl implements AdminService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public CompilationDto addNewCompilation(NewCompilationDto newCompilationDto) {
+        return null;
+    }
+
+    @Override
+    public CompilationDto updateCompilation(long compilationId, UpdateCompilationRequest updateCompilationRequest) {
+        return null;
+    }
+
+    @Override
+    public void deleteCompilation(long compilationId) {
+        log.info("Sending to repository request to delete compilation with id {}.", compilationId);
+    }
+
     private List<UserDto> formResultForUserListRequest(List<User> userList, int from, int size) {
         log.info("Repository answered {}, forming answer to controller.", userList);
         if (userList.size() < from) {
@@ -80,6 +138,23 @@ public class AdminServiceImpl implements AdminService {
         } else {
             return userList.subList(0, size-1).stream()
                     .map(utils::convertUserToDto)
+                    .collect(Collectors.toList());
+        }
+    }
+    private List<EventFullDto> formResultForEventSearch(List<Event> events, int from, int size) {
+        log.info("Repository answered {}, forming answer to controller.", events);
+        if (events.size() < from) {
+            log.info("Value 'from'({}) above result list size({}). Returning empty list.", from, events.size());
+            return new ArrayList<>();
+        }
+        events = events.subList(from, events.size());
+        if (events.size() <= size) {
+            return events.stream()
+                    .map(utils::convertEventToFullDto)
+                    .collect(Collectors.toList());
+        } else {
+            return events.subList(0, size-1).stream()
+                    .map(utils::convertEventToFullDto)
                     .collect(Collectors.toList());
         }
     }

@@ -30,7 +30,7 @@ public class PrivateController {
     @ResponseStatus(code = HttpStatus.CREATED)
     public ParticipationRequestDto addNewRequest(@PathVariable long userId, @RequestParam long eventId) {
         log.info("Received request to add new participation request for event {}  from user: {}.", eventId, userId);
-        return null;
+        return privateService.addNewEventRequest(userId, eventId);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
@@ -49,6 +49,13 @@ public class PrivateController {
         return privateService.updateEventRequests(userId, eventId, eventRequestStatusUpdateRequest);
     }
 
+    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ParticipationRequestDto deleteOwnRequest(@PathVariable long userId, @PathVariable long requestId) {
+        log.info("Received request to delete request: {} from user {}.", requestId, userId);
+        return privateService.deleteOwnRequest(userId, requestId);
+    }
+
     @GetMapping("/users/{userId}/events/{eventId}")
     @ResponseStatus(code = HttpStatus.OK)
     public EventFullDto getEventInformation(@PathVariable long userId, @PathVariable long eventId) {
@@ -61,5 +68,11 @@ public class PrivateController {
     public List<ParticipationRequestDto> getEventRequests(@PathVariable long userId, @PathVariable long eventId) {
         log.info("Received request to get information about event: {} participants, from user: {}.", eventId, userId);
         return privateService.getEventRequests(userId, eventId);
+    }
+    @GetMapping("/users/{userId}/requests")
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<ParticipationRequestDto> getOwnRequestsInformation(@PathVariable long userId) {
+        log.info("Received request to get information about own requests from user: {}.", userId);
+        return privateService.getOwnRequestsInformation(userId);
     }
 }

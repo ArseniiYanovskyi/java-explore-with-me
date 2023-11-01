@@ -6,7 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.client.StatisticClient;
 import ru.practicum.dto.StatisticInfoDto;
+import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.event.dto.EventShortDto;
+import ru.practicum.model.event.dto.PublicSearchEventParameters;
+import ru.practicum.model.event.dto.PublicSearchEventSort;
 import ru.practicum.public_package.service.PublicService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class PublicController {
-    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final PublicService publicService;
     private final StatisticClient statisticClient;
 
@@ -38,36 +41,56 @@ public class PublicController {
     }
 
     @GetMapping("/compilations")
+    @ResponseStatus(code = HttpStatus.OK)
     public void getCompilationList() {
 
     }
 
     @GetMapping("/compilations/{compId}")
+    @ResponseStatus(code = HttpStatus.OK)
     public void getCompilationListById() {
 
     }
 
     @GetMapping("/events")
-    public void getEvents(HttpServletRequest request) {
-        log.info("Sending to statistic client information about request. Api: explore_with_me_service, URI: {}, IP: {}.",
-                request.getRequestURI(), request.getRemoteAddr());
-        statisticClient.post(StatisticInfoDto.builder()
-                .app("explore_with_me_service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now().format(formatter))
-                .build());
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<EventShortDto> getEvents(@RequestParam String text,
+                          @RequestParam List<Integer> categories, @RequestParam Boolean paid,
+                          @RequestParam(required = false) String rangeStart, @RequestParam(required = false) String rangeEnd,
+                          @RequestParam(defaultValue = "false") Boolean onlyAvailable, @RequestParam String sort,
+                          @RequestParam(defaultValue = "0") int from, @RequestParam (defaultValue = "10") int size,
+                          HttpServletRequest request) {
+        log.info("Receive request to get events by parameters.");
+        List<EventShortDto> result = publicService.getEventsByParameters(PublicSearchEventParameters.builder()
+                        .text(text)
+                        .categories(categories)
+                        .paid(paid)
+                        .rangeStart(rangeStart)
+                        .rangeEnd(rangeEnd)
+                        .onlyAvailable(onlyAvailable)
+                        .sortType(sort)
+                        .from(from)
+                        .size(size)
+                        .build());
+        sendStatistic(request);
+        return result;
     }
 
     @GetMapping("/events/{eventId}")
+    @ResponseStatus(code = HttpStatus.OK)
     public void getEventById(@PathVariable long eventId, HttpServletRequest request) {
+
+        sendStatistic(request);
+    }
+
+    private void sendStatistic(HttpServletRequest request) {
         log.info("Sending to statistic client information about request. Api: explore_with_me_service, URI: {}, IP: {}.",
                 request.getRequestURI(), request.getRemoteAddr());
         statisticClient.post(StatisticInfoDto.builder()
                 .app("explore_with_me_service")
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now().format(formatter))
+                .timestamp(LocalDateTime.now().format(Mapper.formatter))
                 .build());
     }
 }

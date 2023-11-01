@@ -16,4 +16,6 @@ public interface PrivateService {
     public EventRequestStatusUpdateResult updateEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
     public EventFullDto getEventInformation(long userId, long eventId);
     public List<ParticipationRequestDto> getEventRequests(long userId, long eventId);
+    public List<ParticipationRequestDto> getOwnRequestsInformation(long userId);
+    public ParticipationRequestDto deleteOwnRequest(long userId, long requestId);
 }

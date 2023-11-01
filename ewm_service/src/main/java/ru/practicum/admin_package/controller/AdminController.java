@@ -5,6 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.dto.CompilationDto;
+import ru.practicum.model.compilation.dto.NewCompilationDto;
+import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.event.dto.AdminEventSearchParameters;
+import ru.practicum.model.event.dto.UpdateEventAdminRequest;
 import ru.practicum.model.user.dto.UserDto;
 import ru.practicum.admin_package.service.AdminService;
 
@@ -25,11 +30,72 @@ public class AdminController {
         return adminService.addCategory(categoryDto);
     }
 
+    @PostMapping("/users")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public UserDto addUser(@RequestBody UserDto userDto) {
+        log.info("Received request to add new user name: {}. email: {}.", userDto.getName(), userDto.getEmail());
+        return adminService.addUser(userDto);
+    }
+    @PostMapping("/compilations")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public CompilationDto addCompilation(@RequestBody NewCompilationDto newCompilationDto) {
+        log.info("Received request to add new compilation title: {}, pinned: {}, events: {}.", newCompilationDto.getTitle(), newCompilationDto.getPinned(), newCompilationDto.getEvents());
+        return adminService.addNewCompilation(newCompilationDto);
+    }
+
     @PatchMapping("/categories/{catId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public CategoryDto updateCategory(@PathVariable(value = "catId") long catId, @RequestBody CategoryDto categoryDto) {
+    public CategoryDto updateCategory(@PathVariable long catId, @RequestBody CategoryDto categoryDto) {
         log.info("Received request to update category with id {} to a new name: {}.", catId, categoryDto.getName());
         return adminService.updateCategory(catId, categoryDto);
+    }
+
+    @PatchMapping("/events/{eventId}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public EventFullDto updateEvent(@PathVariable long eventId, @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
+        log.info("Received request to update event {}.", eventId);
+        return adminService.updateEvent(eventId, updateEventAdminRequest);
+    }
+
+    @GetMapping("/users")
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
+                                  @RequestParam(defaultValue = "0") int from,
+                                  @RequestParam(defaultValue = "10") int size) {
+        if (ids == null) {
+            ids = new ArrayList<>();
+        }
+        log.info("Received request to get users list from {}, size {}.", from, size);
+        return adminService.getUsersList(ids, from, size);
+    }
+
+    @GetMapping("/events")
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<EventFullDto> searchEvents(@RequestParam List<Long> users,
+                                           @RequestParam List<String> states,
+                                           @RequestParam List<Long> categories,
+                                           @RequestParam String rangeStart,
+                                           @RequestParam String rangeEnd,
+                                           @RequestParam(defaultValue = "0") int from,
+                                           @RequestParam(defaultValue = "10") int size) {
+        log.info("Received request to search events from users {} in {} states, in {} categories from time {} to time {}.",
+                users, states, categories, rangeStart, rangeEnd);
+        return adminService.searchEvent(AdminEventSearchParameters.builder()
+                        .usersIds(users)
+                        .states(states)
+                        .categories(categories)
+                        .rangeStart(rangeStart)
+                        .rangeEnd(rangeEnd)
+                        .from(from)
+                        .size(size)
+                        .build());
+    }
+
+    @DeleteMapping("/users/{userId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable(value = "userId") long userId) {
+        log.info("Received request to delete user with id {}.", userId);
+        adminService.deleteUser(userId);
     }
 
     @DeleteMapping("/categories/{catId}")
@@ -39,29 +105,10 @@ public class AdminController {
         adminService.deleteCategory(catId);
     }
 
-    @PostMapping("/users")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public UserDto addUser(@RequestBody UserDto userDto) {
-        log.info("Received request to add new user name: {}. email: {}.", userDto.getName(), userDto.getEmail());
-        return adminService.addUser(userDto);
-    }
-
-    @GetMapping("/users")
-    @ResponseStatus(code = HttpStatus.OK)
-    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
-                                  @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam (defaultValue = "10") int size) {
-        if (ids == null) {
-            ids = new ArrayList<>();
-        }
-        log.info("Received request to get users list from {}, size {}.", from, size);
-        return adminService.getUsersList(ids, from, size);
-    }
-
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/compilations/{compId}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable(value = "userId") long userId) {
-        log.info("Received request to delete user with id {}.", userId);
-        adminService.deleteUser(userId);
+    public void deleteCompilation(@PathVariable(value = "compId") long compId) {
+        log.info("Received request to delete compilation with id {}.", compId);
+        adminService.deleteCompilation(compId);
     }
 }
