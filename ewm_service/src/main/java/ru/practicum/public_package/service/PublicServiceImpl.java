@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dao.CategoryRepository;
+import ru.practicum.dao.CompilationRepository;
+import ru.practicum.dao.CompilationsEventsDB;
 import ru.practicum.dao.EventRepository;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.Compilation;
+import ru.practicum.model.compilation.dto.CompilationDto;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.State;
-import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.PublicSearchEventParameters;
 import ru.practicum.model.event.dto.PublicSearchEventSort;
@@ -20,8 +23,8 @@ import ru.practicum.public_package.service.utils.PublicServiceUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +34,8 @@ public class PublicServiceImpl implements PublicService{
     private final PublicServiceUtils utils;
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
+    private final CompilationRepository compilationRepository;
+    private final CompilationsEventsDB compilationsEventsRepository;
     @Override
     public List<CategoryDto> getCategoriesList(int from, int size) {
         log.info("Sending to repository request to get categories list.");
@@ -105,6 +110,26 @@ public class PublicServiceImpl implements PublicService{
         return result;
     }
 
+    @Override
+    public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
+        log.info("Sending to repository request to get Pinned({}) compilations.", pinned);
+        List<Compilation> compilations = compilationRepository.findAllByPinnedIs(pinned);
+        return formResultForCompilations(compilations, from, size);
+    }
+
+    @Override
+    public CompilationDto getCompilationById(long compilationId) {
+        log.info("Sending to repository request to get compilation with id {}.", compilationId);
+        Compilation compilation = compilationRepository.findById(compilationId)
+                .orElseThrow(() -> new NotFoundException("Compilation with id " + compilationId + " does not present in repository."));
+        List<Event> compilationEvents = compilationsEventsRepository.getCompilationEvents(compilationId).stream()
+                .map(eventRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        return utils.convertCompilationToDto(compilation, compilationEvents);
+    }
+
     private List<EventShortDto> formResultForEventSearch(List<Event> events, PublicSearchEventParameters parameters) {
         log.info("Repository answered {}, forming answer to controller.", events);
         if (events.size() < parameters.getFrom()) {
@@ -119,6 +144,24 @@ public class PublicServiceImpl implements PublicService{
         } else {
             return events.subList(0, parameters.getSize()-1).stream()
                     .map(utils::convertEventToShortDto)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private List<CompilationDto> formResultForCompilations(List<Compilation> compilations, int from, int size) {
+        log.info("Repository answered {}, forming answer to controller.", compilations);
+        if (compilations.size() < from) {
+            log.info("Value 'from'({}) above result list size({}). Returning empty list.", from, compilations.size());
+            return new ArrayList<>();
+        }
+        compilations = compilations.subList(from, compilations.size());
+        if (compilations.size() <= size) {
+            return compilations.stream()
+                    .map(compilation -> utils.convertCompilationToDto(compilation, eventRepository.findAllById(compilationsEventsRepository.getCompilationEvents(compilation.getId()))))
+                    .collect(Collectors.toList());
+        } else {
+            return compilations.subList(0, size-1).stream()
+                    .map(compilation -> utils.convertCompilationToDto(compilation, eventRepository.findAllById(compilationsEventsRepository.getCompilationEvents(compilation.getId()))))
                     .collect(Collectors.toList());
         }
     }

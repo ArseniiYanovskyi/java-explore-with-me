@@ -9,10 +9,7 @@ import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.State;
-import ru.practicum.model.event.dto.EventFullDto;
-import ru.practicum.model.event.dto.NewEventDto;
-import ru.practicum.model.event.dto.StateAction;
-import ru.practicum.model.event.dto.UpdateEventUserRequest;
+import ru.practicum.model.event.dto.*;
 import ru.practicum.model.exception.IncorrectRequestException;
 import ru.practicum.model.exception.NotFoundException;
 import ru.practicum.model.request.Request;
@@ -131,6 +128,10 @@ public class PrivateServiceUtils {
                 .map(Mapper::createParticipationRequestDto)
                 .collect(Collectors.toList());
     }
+    public EventShortDto convertEventToShortDto(Event event) {
+        return Mapper.convertEventToShortDto(event);
+    }
+
 
     public void checkIsUserPresent(long userId) {
         if (userRepository.findById(userId).isEmpty()) {

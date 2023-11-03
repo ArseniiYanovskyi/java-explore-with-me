@@ -1,6 +1,7 @@
 package ru.practicum.public_package.service;
 
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.dto.CompilationDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.PublicSearchEventParameters;
 
@@ -11,4 +12,6 @@ public interface PublicService {
     public CategoryDto getCategoryById(long categoryId);
     public List<EventShortDto> getEventsByParameters(PublicSearchEventParameters parameters);
     public EventShortDto getEventById(long eventId);
+    public List<CompilationDto> getCompilations(Boolean pinned, int from, int size);
+    public CompilationDto getCompilationById(long compilationId);
 }

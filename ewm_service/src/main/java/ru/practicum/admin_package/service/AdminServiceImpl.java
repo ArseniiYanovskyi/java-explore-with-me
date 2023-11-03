@@ -3,12 +3,11 @@ package ru.practicum.admin_package.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.dao.CategoryRepository;
-import ru.practicum.dao.EventRepository;
-import ru.practicum.dao.UserRepository;
+import ru.practicum.dao.*;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.Compilation;
 import ru.practicum.model.compilation.dto.CompilationDto;
 import ru.practicum.model.compilation.dto.NewCompilationDto;
 import ru.practicum.model.compilation.dto.UpdateCompilationRequest;
@@ -37,7 +36,8 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
-
+    private final CompilationRepository compilationRepository;
+    private final CompilationsEventsDB compilationsEventsRepository;
     @Override
     public CategoryDto addCategory(CategoryDto categoryDto) {
         log.info("Sending to repository request to add new category: {}.", categoryDto.getName());
@@ -111,17 +111,39 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public CompilationDto addNewCompilation(NewCompilationDto newCompilationDto) {
-        return null;
+        Compilation compilation = utils.convertCompilationFromDto(newCompilationDto);
+        log.info("Sending to repository request to save new compilation.");
+        compilation = compilationRepository.save(compilation);
+        log.info("Sending to repository request to save compilation events id's.");
+        compilationsEventsRepository.saveCompilationEvents(compilation.getId(), newCompilationDto.getEvents());
+        log.info("Sending to repository request to get new compilation events: {}.", newCompilationDto.getEvents());
+        List<Event> compilationEvents = eventRepository.findAllById(newCompilationDto.getEvents());
+        return utils.convertCompilationToDto(compilation, compilationEvents);
     }
 
     @Override
     public CompilationDto updateCompilation(long compilationId, UpdateCompilationRequest updateCompilationRequest) {
-        return null;
+        Compilation compilation = compilationRepository.findById(compilationId)
+                .orElseThrow(() -> new NotFoundException("Compilation with id " + compilationId + " does not present in repository."));
+        if (updateCompilationRequest.getEvents() != null) {
+            log.info("Sending to repository request to delete old compilation events id's.");
+            compilationsEventsRepository.deleteCompilationEvents(compilationId);
+            log.info("Sending to repository request to save compilation events id's: {}.", updateCompilationRequest.getEvents());
+            compilationsEventsRepository.saveCompilationEvents(compilationId, updateCompilationRequest.getEvents());
+        }
+        compilation = utils.updateCompilationObject(compilation, updateCompilationRequest);
+        log.info("Sending to repository request to update compilation.");
+        compilationRepository.save(compilation);
+        List<Event> compilationEvents = eventRepository.findAllById(compilationsEventsRepository.getCompilationEvents(compilationId));
+        return utils.convertCompilationToDto(compilation, compilationEvents);
     }
 
     @Override
     public void deleteCompilation(long compilationId) {
+        compilationRepository.findById(compilationId)
+                        .orElseThrow(() -> new NotFoundException("Compilation with id " + compilationId + " does not present in repository."));
         log.info("Sending to repository request to delete compilation with id {}.", compilationId);
+        compilationRepository.deleteById(compilationId);
     }
 
     private List<UserDto> formResultForUserListRequest(List<User> userList, int from, int size) {

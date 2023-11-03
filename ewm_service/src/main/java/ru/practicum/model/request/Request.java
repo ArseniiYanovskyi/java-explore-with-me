@@ -22,11 +22,11 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "requester", nullable = false)
+    @JoinColumn(name = "requester_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User requester;
-    @Column(name = "event", nullable = false)
+    @JoinColumn(name = "event_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Event event;

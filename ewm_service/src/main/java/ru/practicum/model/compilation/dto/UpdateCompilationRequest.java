@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class UpdateCompilationRequest {
-    private List<Integer> events;
+    private List<Long> events;
     private Boolean pinned;
     private String title;
 }

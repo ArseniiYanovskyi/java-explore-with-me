@@ -2,12 +2,17 @@ package ru.practicum.private_package.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.dao.EventRepository;
 import ru.practicum.dao.RequestRepository;
 import ru.practicum.dao.UserRepository;
 import ru.practicum.model.event.Event;
+import ru.practicum.model.event.State;
 import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
 import ru.practicum.model.event.dto.UpdateEventUserRequest;
 import ru.practicum.model.exception.IncorrectRequestException;
@@ -41,7 +46,7 @@ public class PrivateServiceImpl implements PrivateService {
     @Override
     public ParticipationRequestDto addNewEventRequest(long userId, long eventId) {
         Request request = utils.createRequest(userId, eventId);
-        if (!request.getEvent().isPublished()) {
+        if (!request.getEvent().getState().equals(State.PUBLISHED)) {
             throw new IncorrectRequestException("Event " + eventId + " is not published.");
         }
         if (requestRepository.findByRequesterIdAndEventId(userId, eventId).isPresent()) {
@@ -95,7 +100,7 @@ public class PrivateServiceImpl implements PrivateService {
         eventRepository.save(event);
 
         if (event.getParticipantLimit() == event.getConfirmedRequests()) {
-            List<Request> otherEventRequests = requestRepository.findAllByEventIdAAndStatus(eventId, Status.PENDING);
+            List<Request> otherEventRequests = requestRepository.findAllByEventIdAndStatus(eventId, Status.PENDING);
             if (otherEventRequests == null || otherEventRequests.isEmpty()) {
                 return requestStatusUpdateResult;
             }
@@ -115,6 +120,15 @@ public class PrivateServiceImpl implements PrivateService {
     public EventFullDto getEventInformation(long userId, long eventId) {
         log.info("Sending to repository request to get event with id {} by user {}.", eventId, userId);
         return utils.convertEventToFullDto(utils.getEventByOwner(userId, eventId));
+    }
+
+    @Override
+    public List<EventShortDto> getUserEvents(long userId, int from, int size) {
+        log.info("Sending to repository request to get events of user: {}.", userId);
+        Pageable pageable = PageRequest.of(from / size, size);
+        return eventRepository.findAllByInitiatorId(userId, pageable).stream()
+                .map(utils::convertEventToShortDto)
+                .collect(Collectors.toList());
     }
 
     @Override

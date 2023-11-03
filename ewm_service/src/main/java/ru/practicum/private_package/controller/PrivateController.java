@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
 import ru.practicum.model.event.dto.UpdateEventUserRequest;
 import ru.practicum.model.request.dto.EventRequestStatusUpdateRequest;
@@ -54,6 +55,13 @@ public class PrivateController {
     public ParticipationRequestDto deleteOwnRequest(@PathVariable long userId, @PathVariable long requestId) {
         log.info("Received request to delete request: {} from user {}.", requestId, userId);
         return privateService.deleteOwnRequest(userId, requestId);
+    }
+
+    @GetMapping("/users/{userId}/events")
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<EventShortDto> getUserEvents(@PathVariable long userId, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
+        log.info("Received request to get events of user: {}.", userId);
+        return privateService.getUserEvents(userId, from, size);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")

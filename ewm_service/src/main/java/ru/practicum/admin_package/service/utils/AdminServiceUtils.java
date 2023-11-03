@@ -3,9 +3,15 @@ package ru.practicum.admin_package.service.utils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.dao.CategoryRepository;
+import ru.practicum.dao.CompilationsEventsDB;
+import ru.practicum.dao.EventRepository;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.Compilation;
+import ru.practicum.model.compilation.dto.CompilationDto;
+import ru.practicum.model.compilation.dto.NewCompilationDto;
+import ru.practicum.model.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.State;
 import ru.practicum.model.event.dto.EventFullDto;
@@ -17,19 +23,22 @@ import ru.practicum.model.user.User;
 import ru.practicum.model.user.dto.UserDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 public class AdminServiceUtils {
     private final CategoryRepository categoryRepository;
-
     public Category convertCategoryFromDto(CategoryDto categoryDto) {
         return Mapper.convertCategoryFromDto(categoryDto);
     }
 
     public Event updateEventObject(Event event, UpdateEventAdminRequest updateEventAdminRequest) {
-        if (LocalDateTime.parse(updateEventAdminRequest.getEventDate(), Mapper.formatter).isBefore(LocalDateTime.now().plusHours(1))) {
-            throw new IncorrectRequestException("Time of updated by admin event can't be earlier than 1 hours later.");
+        if (updateEventAdminRequest.getEventDate() != null) {
+            if (LocalDateTime.parse(updateEventAdminRequest.getEventDate(), Mapper.formatter).isBefore(LocalDateTime.now().plusHours(1))) {
+                throw new IncorrectRequestException("Time of updated by admin event can't be earlier than 1 hours later.");
+            }
         }
         if (updateEventAdminRequest.getStateAction() != null) {
             if (!event.getState().equals(State.PENDING)) {
@@ -89,5 +98,33 @@ public class AdminServiceUtils {
 
     public UserDto convertUserToDto(User user) {
         return Mapper.convertUserToDto(user);
+    }
+
+    public Compilation convertCompilationFromDto(NewCompilationDto newCompilationDto) {
+        return Compilation.builder()
+                .title(newCompilationDto.getTitle())
+                .pinned(newCompilationDto.getPinned())
+                .build();
+    }
+
+    public CompilationDto convertCompilationToDto(Compilation compilation, List<Event> events) {
+        return CompilationDto.builder()
+                .id(compilation.getId())
+                .events(events.stream()
+                        .map(Mapper::convertEventToShortDto)
+                        .collect(Collectors.toList()))
+                .pinned(compilation.getPinned())
+                .title(compilation.getTitle())
+                .build();
+    }
+
+    public Compilation updateCompilationObject(Compilation compilation, UpdateCompilationRequest updateCompilationRequest) {
+        if (updateCompilationRequest.getPinned() != null) {
+            compilation.setPinned(updateCompilationRequest.getPinned());
+        }
+        if (updateCompilationRequest.getTitle() != null) {
+            compilation.setTitle(updateCompilationRequest.getTitle());
+        }
+        return compilation;
     }
 }

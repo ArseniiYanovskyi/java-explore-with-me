@@ -8,14 +8,13 @@ import ru.practicum.client.StatisticClient;
 import ru.practicum.dto.StatisticInfoDto;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.dto.CategoryDto;
+import ru.practicum.model.compilation.dto.CompilationDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.PublicSearchEventParameters;
-import ru.practicum.model.event.dto.PublicSearchEventSort;
 import ru.practicum.public_package.service.PublicService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -42,14 +41,16 @@ public class PublicController {
 
     @GetMapping("/compilations")
     @ResponseStatus(code = HttpStatus.OK)
-    public void getCompilationList() {
-
+    public List<CompilationDto> getCompilationList(@RequestParam Boolean pinned, @RequestParam int from, @RequestParam int size) {
+        log.info("Received request to get compilations.");
+        return publicService.getCompilations(pinned, from, size);
     }
 
     @GetMapping("/compilations/{compId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public void getCompilationListById() {
-
+    public CompilationDto getCompilationListById(@PathVariable long compId) {
+        log.info("Received request to get compilation with id: {}.", compId);
+        return publicService.getCompilationById(compId);
     }
 
     @GetMapping("/events")

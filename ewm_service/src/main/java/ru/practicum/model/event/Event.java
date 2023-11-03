@@ -33,11 +33,11 @@ public class Event {
     @NotBlank
     @Column(name = "annotation", nullable = false)
     private String annotation;
-    @Column(name = "initiator", nullable = false)
+    @JoinColumn(name = "initiator_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User initiator;
-    @Column(name = "category", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Category category;

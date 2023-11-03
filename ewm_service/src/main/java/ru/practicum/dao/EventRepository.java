@@ -1,5 +1,6 @@
 package ru.practicum.dao;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.model.event.Event;
 import ru.practicum.model.event.State;
@@ -15,4 +16,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     public List<Event> findAllByStateIsAndEventDateIsAfterAndCategoryIdInOrderByEventDateAsc(State state, Timestamp now, List<Integer> categories);
     public List<Event> findAllByStateIsAndEventDateIsAfterAndCategoryIdInOrderByViewsDesc(State state, Timestamp now, List<Integer> categories);
     public Optional<Event> findByIdIsAndStateIs(long eventId, State state);
+    public List<Event> findAllByInitiatorId(long initiatorId, Pageable page);
 }

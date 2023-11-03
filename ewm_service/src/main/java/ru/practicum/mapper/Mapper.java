@@ -79,6 +79,10 @@ public class Mapper {
     }
 
     public static EventFullDto convertEventToFullDto(Event event) {
+        String publishedTime = "";
+        if (event.getPublishedTime() != null) {
+            publishedTime = event.getPublishedTime().format(formatter);
+        }
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -86,7 +90,7 @@ public class Mapper {
                 .categoryDto(convertCategoryToDto(event.getCategory()))
                 .initiator(convertUserToShortDto(event.getInitiator()))
                 .createdOn(event.getCreatedOn().format(formatter))
-                .publishedOn(event.getPublishedTime().format(formatter))
+                .publishedOn(publishedTime)
                 .eventDate(event.getEventDate().format(formatter))
                 .location(new Location(event.getLatitude(), event.getLongitude()))
                 .paid(event.isPaid())
