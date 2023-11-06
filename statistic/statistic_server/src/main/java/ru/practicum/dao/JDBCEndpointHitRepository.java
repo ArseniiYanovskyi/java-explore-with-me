@@ -101,7 +101,7 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         final String query = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
                 "FROM endpointhits " +
                 "WHERE uri LIKE ? " +
-                "GROUP BY uri, app" ;
+                "GROUP BY uri, app";
         return Optional.ofNullable(jdbcTemplate.queryForObject(query, (rs, rowNum) -> makeAnswer(rs), url));
     }
 

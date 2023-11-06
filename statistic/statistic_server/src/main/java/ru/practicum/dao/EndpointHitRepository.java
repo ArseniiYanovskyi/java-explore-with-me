@@ -14,5 +14,6 @@ public interface EndpointHitRepository {
     List<StatisticAnswerDto> getStatistic(List<String> uris, LocalDateTime start, LocalDateTime end);
 
     List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end);
+
     Optional<StatisticAnswerDto> getStatisticByEndpoint(String url);
 }

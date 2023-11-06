@@ -10,7 +10,6 @@ import ru.practicum.mapper.StatisticMapper;
 import ru.practicum.model.exception.BadRequestException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

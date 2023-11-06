@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface StatisticService {
     void saveStatisticInfo(StatisticInfoDto statisticInfoDto);
+
     List<StatisticAnswerDto> getStatisticInfoByParameters(StatisticRequestDto statisticRequestDto);
+
     StatisticAnswerDto getStatisticForEndPoint(String endPoint);
 }
