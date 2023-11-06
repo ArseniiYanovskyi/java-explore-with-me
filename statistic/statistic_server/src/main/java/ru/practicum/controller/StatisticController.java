@@ -34,4 +34,11 @@ public class StatisticController {
 
         return service.getStatisticInfoByParameters(StatisticMapper.createStatisticRequestDto(start,end,uris,unique));
     }
+    @GetMapping("/stats/{url}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public StatisticAnswerDto getStatisticInformationByEventId(@PathVariable String url) {
+        log.info("Received request to get statistic for endpoint {}.", url);
+
+        return service.getStatisticForEndPoint(url);
+    }
 }

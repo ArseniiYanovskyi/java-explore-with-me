@@ -24,7 +24,7 @@ public class CompilationsEventsDB {
 
     public List<Long> getCompilationEvents(long compilationId) {
         final String sqlQuery = "SELECT event_id FROM compilations_events " +
-                "WHERE compilaltion_id = ?";
+                "WHERE compilation_id = ?";
         return jdbcTemplate.query(sqlQuery, new IdRowMapper(), compilationId);
     }
 

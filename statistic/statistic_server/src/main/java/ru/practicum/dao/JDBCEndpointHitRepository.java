@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -93,6 +94,15 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         return returningList.stream()
                 .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<StatisticAnswerDto> getStatisticByEndpoint(String url) {
+        final String query = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
+                "FROM endpointhits " +
+                "WHERE uri LIKE ? " +
+                "GROUP BY uri, app" ;
+        return Optional.ofNullable(jdbcTemplate.queryForObject(query, (rs, rowNum) -> makeAnswer(rs), url));
     }
 
     private StatisticAnswerDto makeAnswer(ResultSet rs) {

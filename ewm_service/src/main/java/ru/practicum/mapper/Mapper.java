@@ -8,7 +8,6 @@ import ru.practicum.model.event.State;
 import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.NewEventDto;
-import ru.practicum.model.event.dto.UpdateEventUserRequest;
 import ru.practicum.model.request.Request;
 import ru.practicum.model.request.Status;
 import ru.practicum.model.request.dto.ParticipationRequestDto;
@@ -67,18 +66,17 @@ public class Mapper {
                 .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
                 .createdOn(LocalDateTime.now())
                 .latitude(newEventDto.getLocation().getLat())
-                .longitude(newEventDto.getLocation().getLen())
-                .paid(newEventDto.isPaid())
-                .requestModeration(newEventDto.isRequestModeration())
+                .longitude(newEventDto.getLocation().getLon())
+                .paid(newEventDto.getPaid())
+                .requestModeration(newEventDto.getRequestModeration())
                 .participantLimit(newEventDto.getParticipantLimit())
                 .title(newEventDto.getTitle())
                 .confirmedRequests(0)
                 .state(State.PENDING)
-                .views(0)
                 .build();
     }
 
-    public static EventFullDto convertEventToFullDto(Event event) {
+    public static EventFullDto convertEventToFullDto(Event event, long views) {
         String publishedTime = "";
         if (event.getPublishedTime() != null) {
             publishedTime = event.getPublishedTime().format(formatter);
@@ -87,7 +85,8 @@ public class Mapper {
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .title(event.getTitle())
-                .categoryDto(convertCategoryToDto(event.getCategory()))
+                .description(event.getDescription())
+                .category(convertCategoryToDto(event.getCategory()))
                 .initiator(convertUserToShortDto(event.getInitiator()))
                 .createdOn(event.getCreatedOn().format(formatter))
                 .publishedOn(publishedTime)
@@ -98,21 +97,21 @@ public class Mapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .requestModeration(event.isRequestModeration())
                 .state(event.getState())
-                .views(event.getViews())
+                .views(views)
                 .build();
     }
 
-    public static EventShortDto convertEventToShortDto(Event event) {
+    public static EventShortDto convertEventToShortDto(Event event, long views) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .title(event.getTitle())
-                .categoryDto(convertCategoryToDto(event.getCategory()))
+                .category(convertCategoryToDto(event.getCategory()))
                 .initiator(convertUserToShortDto(event.getInitiator()))
                 .eventDate(event.getEventDate().format(formatter))
                 .paid(event.isPaid())
                 .confirmedRequests(event.getConfirmedRequests())
-                .views(event.getViews())
+                .views(views)
                 .build();
     }
 

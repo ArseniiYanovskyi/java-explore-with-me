@@ -4,14 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.admin_package.service.AdminService;
 import ru.practicum.model.category.dto.CategoryDto;
 import ru.practicum.model.compilation.dto.CompilationDto;
 import ru.practicum.model.compilation.dto.NewCompilationDto;
-import ru.practicum.model.event.dto.EventFullDto;
+import ru.practicum.model.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.model.event.dto.AdminEventSearchParameters;
+import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.UpdateEventAdminRequest;
 import ru.practicum.model.user.dto.UserDto;
-import ru.practicum.admin_package.service.AdminService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class AdminController {
         log.info("Received request to add new user name: {}. email: {}.", userDto.getName(), userDto.getEmail());
         return adminService.addUser(userDto);
     }
+
     @PostMapping("/compilations")
     @ResponseStatus(code = HttpStatus.CREATED)
     public CompilationDto addCompilation(@RequestBody NewCompilationDto newCompilationDto) {
@@ -57,6 +59,13 @@ public class AdminController {
         return adminService.updateEvent(eventId, updateEventAdminRequest);
     }
 
+    @PatchMapping("/compilations/{compId}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public CompilationDto updateCompilation(@PathVariable(value = "compId") long compId, @RequestBody UpdateCompilationRequest updateCompilationRequest) {
+        log.info("Received request to update compilation with id {}.", compId);
+        return adminService.updateCompilation(compId, updateCompilationRequest);
+    }
+
     @GetMapping("/users")
     @ResponseStatus(code = HttpStatus.OK)
     public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
@@ -71,24 +80,24 @@ public class AdminController {
 
     @GetMapping("/events")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<EventFullDto> searchEvents(@RequestParam List<Long> users,
-                                           @RequestParam List<String> states,
-                                           @RequestParam List<Long> categories,
-                                           @RequestParam String rangeStart,
-                                           @RequestParam String rangeEnd,
+    public List<EventFullDto> searchEvents(@RequestParam(required = false) List<Long> users,
+                                           @RequestParam(required = false) List<String> states,
+                                           @RequestParam(required = false) List<Long> categories,
+                                           @RequestParam(required = false) String rangeStart,
+                                           @RequestParam(required = false) String rangeEnd,
                                            @RequestParam(defaultValue = "0") int from,
                                            @RequestParam(defaultValue = "10") int size) {
         log.info("Received request to search events from users {} in {} states, in {} categories from time {} to time {}.",
                 users, states, categories, rangeStart, rangeEnd);
         return adminService.searchEvent(AdminEventSearchParameters.builder()
-                        .usersIds(users)
-                        .states(states)
-                        .categories(categories)
-                        .rangeStart(rangeStart)
-                        .rangeEnd(rangeEnd)
-                        .from(from)
-                        .size(size)
-                        .build());
+                .usersIds(users)
+                .states(states)
+                .categories(categories)
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .from(from)
+                .size(size)
+                .build());
     }
 
     @DeleteMapping("/users/{userId}")

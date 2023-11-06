@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 public class PublicSearchEventParameters {
     private String text;
-    private List<Integer> categories;
+    private List<Long> categories;
     private Boolean paid;
     private String rangeStart;
     private String rangeEnd;

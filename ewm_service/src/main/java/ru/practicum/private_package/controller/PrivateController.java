@@ -20,6 +20,7 @@ import java.util.List;
 @Slf4j
 public class PrivateController {
     private final PrivateService privateService;
+
     @PostMapping("/users/{userId}/events")
     @ResponseStatus(code = HttpStatus.CREATED)
     public EventFullDto addNewEvent(@PathVariable long userId, @RequestBody NewEventDto newEventDto) {
@@ -77,6 +78,7 @@ public class PrivateController {
         log.info("Received request to get information about event: {} participants, from user: {}.", eventId, userId);
         return privateService.getEventRequests(userId, eventId);
     }
+
     @GetMapping("/users/{userId}/requests")
     @ResponseStatus(code = HttpStatus.OK)
     public List<ParticipationRequestDto> getOwnRequestsInformation(@PathVariable long userId) {

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.beans.factory.annotation.Value;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.user.User;
 
@@ -47,7 +46,7 @@ public class Event {
     private double latitude;
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
-    @Column(name = "participant_limit", nullable = false)
+    @Column(name = "participant_limit")
     private int participantLimit;
     @Column(name = "created_on")
     private LocalDateTime createdOn;
@@ -55,12 +54,11 @@ public class Event {
     private LocalDateTime publishedTime;
     @Column(name = "paid", nullable = false)
     private boolean paid;
-    @Column(name = "request_moderation", nullable = false)
+    @Column(name = "request_moderation")
     private boolean requestModeration;
     @Column(name = "confirmed_requests", nullable = false)
     private int confirmedRequests;
-    @Column(name = "state", nullable = false)
+    @Column(name = "state_condition", nullable = false)
+    @Enumerated(EnumType.STRING)
     private State state;
-    @Column(name = "views", nullable = false)
-    private int views;
 }

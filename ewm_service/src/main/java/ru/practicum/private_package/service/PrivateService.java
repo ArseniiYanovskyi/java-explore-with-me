@@ -11,13 +11,21 @@ import ru.practicum.model.request.dto.ParticipationRequestDto;
 import java.util.List;
 
 public interface PrivateService {
-    public EventFullDto addNewEvent(long userId, NewEventDto newEventDto);
-    public ParticipationRequestDto addNewEventRequest(long userId, long eventId);
-    public EventFullDto updateEventByOwner(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest);
-    public EventRequestStatusUpdateResult updateEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
-    public EventFullDto getEventInformation(long userId, long eventId);
-    public List<EventShortDto> getUserEvents(long userId, int from, int size);
-    public List<ParticipationRequestDto> getEventRequests(long userId, long eventId);
-    public List<ParticipationRequestDto> getOwnRequestsInformation(long userId);
-    public ParticipationRequestDto deleteOwnRequest(long userId, long requestId);
+    EventFullDto addNewEvent(long userId, NewEventDto newEventDto);
+
+    ParticipationRequestDto addNewEventRequest(long userId, long eventId);
+
+    EventFullDto updateEventByOwner(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest);
+
+    EventRequestStatusUpdateResult updateEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
+
+    EventFullDto getEventInformation(long userId, long eventId);
+
+    List<EventShortDto> getUserEvents(long userId, int from, int size);
+
+    List<ParticipationRequestDto> getEventRequests(long userId, long eventId);
+
+    List<ParticipationRequestDto> getOwnRequestsInformation(long userId);
+
+    ParticipationRequestDto deleteOwnRequest(long userId, long requestId);
 }

@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.exception.ApiError;
-import ru.practicum.model.exception.IncorrectRequestException;
+import ru.practicum.model.exception.BadRequestException;
+import ru.practicum.model.exception.ConflictRequestException;
 import ru.practicum.model.exception.NotFoundException;
 
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError errorResponseIncorrectRequest(IncorrectRequestException e) {
+    public ApiError errorResponseIncorrectRequest(ConflictRequestException e) {
         log.debug("Returning {} answer with message: {}", "CONFLICT", e.getMessage());
         List<String> errors = new ArrayList<>();
         for (StackTraceElement ste : e.getStackTrace()) {
@@ -48,6 +49,23 @@ public class ErrorHandler {
                 .reason(e.getReason())
                 .timestamp(LocalDateTime.now().format(Mapper.formatter))
                 .status(HttpStatus.CONFLICT.toString())
+                .build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError errorResponseIncorrectRequest(BadRequestException e) {
+        log.debug("Returning {} answer with message: {}", "BAD_REQUEST", e.getMessage());
+        List<String> errors = new ArrayList<>();
+        for (StackTraceElement ste : e.getStackTrace()) {
+            errors.add(ste.toString());
+        }
+        return ApiError.builder()
+                .errors(errors)
+                .message(e.getMessage())
+                .reason(e.getReason())
+                .timestamp(LocalDateTime.now().format(Mapper.formatter))
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .build();
     }
 }

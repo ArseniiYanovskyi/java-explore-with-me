@@ -9,6 +9,7 @@ import ru.practicum.dto.StatisticInfoDto;
 import ru.practicum.mapper.Mapper;
 import ru.practicum.model.category.dto.CategoryDto;
 import ru.practicum.model.compilation.dto.CompilationDto;
+import ru.practicum.model.event.dto.EventFullDto;
 import ru.practicum.model.event.dto.EventShortDto;
 import ru.practicum.model.event.dto.PublicSearchEventParameters;
 import ru.practicum.public_package.service.PublicService;
@@ -27,7 +28,7 @@ public class PublicController {
     @GetMapping("/categories")
     @ResponseStatus(code = HttpStatus.OK)
     public List<CategoryDto> getCategoriesList(@RequestParam(defaultValue = "0") int from,
-                                               @RequestParam (defaultValue = "10") int size) {
+                                               @RequestParam(defaultValue = "10") int size) {
         log.info("Received request to get categories list from: {}, size: {}.", from, size);
         return publicService.getCategoriesList(from, size);
     }
@@ -41,7 +42,7 @@ public class PublicController {
 
     @GetMapping("/compilations")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<CompilationDto> getCompilationList(@RequestParam Boolean pinned, @RequestParam int from, @RequestParam int size) {
+    public List<CompilationDto> getCompilationList(@RequestParam(required = false) Boolean pinned, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
         log.info("Received request to get compilations.");
         return publicService.getCompilations(pinned, from, size);
     }
@@ -55,33 +56,35 @@ public class PublicController {
 
     @GetMapping("/events")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<EventShortDto> getEvents(@RequestParam String text,
-                          @RequestParam List<Integer> categories, @RequestParam Boolean paid,
-                          @RequestParam(required = false) String rangeStart, @RequestParam(required = false) String rangeEnd,
-                          @RequestParam(defaultValue = "false") Boolean onlyAvailable, @RequestParam String sort,
-                          @RequestParam(defaultValue = "0") int from, @RequestParam (defaultValue = "10") int size,
-                          HttpServletRequest request) {
+    public List<EventShortDto> getEvents(@RequestParam(required = false) String text,
+                                         @RequestParam(required = false) List<Long> categories, @RequestParam(required = false) Boolean paid,
+                                         @RequestParam(required = false) String rangeStart, @RequestParam(required = false) String rangeEnd,
+                                         @RequestParam(defaultValue = "false") Boolean onlyAvailable, @RequestParam(defaultValue = "EVENT_DATE") String sort,
+                                         @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size,
+                                         HttpServletRequest request) {
         log.info("Receive request to get events by parameters.");
         List<EventShortDto> result = publicService.getEventsByParameters(PublicSearchEventParameters.builder()
-                        .text(text)
-                        .categories(categories)
-                        .paid(paid)
-                        .rangeStart(rangeStart)
-                        .rangeEnd(rangeEnd)
-                        .onlyAvailable(onlyAvailable)
-                        .sortType(sort)
-                        .from(from)
-                        .size(size)
-                        .build());
+                .text(text)
+                .categories(categories)
+                .paid(paid)
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .onlyAvailable(onlyAvailable)
+                .sortType(sort)
+                .from(from)
+                .size(size)
+                .build());
         sendStatistic(request);
         return result;
     }
 
     @GetMapping("/events/{eventId}")
     @ResponseStatus(code = HttpStatus.OK)
-    public void getEventById(@PathVariable long eventId, HttpServletRequest request) {
-
+    public EventFullDto getEventById(@PathVariable long eventId, HttpServletRequest request) {
+        log.info("Receive request to get events by id {}.", request);
+        EventFullDto result = publicService.getEventById(eventId);
         sendStatistic(request);
+        return result;
     }
 
     private void sendStatistic(HttpServletRequest request) {
