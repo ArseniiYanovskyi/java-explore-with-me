@@ -102,7 +102,12 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
                 "FROM endpointhits " +
                 "WHERE uri LIKE ? " +
                 "GROUP BY uri, app";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(query, (rs, rowNum) -> makeAnswer(rs), url));
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(query, (rs, rowNum) -> makeAnswer(rs), url));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+
     }
 
     private StatisticAnswerDto makeAnswer(ResultSet rs) {

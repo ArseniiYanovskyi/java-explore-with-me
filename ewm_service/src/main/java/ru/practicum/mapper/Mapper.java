@@ -1,19 +1,19 @@
 package ru.practicum.mapper;
 
-import ru.practicum.model.category.Category;
-import ru.practicum.model.category.dto.CategoryDto;
-import ru.practicum.model.event.Event;
-import ru.practicum.model.event.Location;
-import ru.practicum.model.event.State;
-import ru.practicum.model.event.dto.EventFullDto;
-import ru.practicum.model.event.dto.EventShortDto;
-import ru.practicum.model.event.dto.NewEventDto;
-import ru.practicum.model.request.Request;
-import ru.practicum.model.request.Status;
-import ru.practicum.model.request.dto.ParticipationRequestDto;
-import ru.practicum.model.user.User;
-import ru.practicum.model.user.dto.UserDto;
-import ru.practicum.model.user.dto.UserShortDto;
+import ru.practicum.category.model.Category;
+import ru.practicum.category.model.dto.CategoryDto;
+import ru.practicum.event.model.Event;
+import ru.practicum.event.model.Location;
+import ru.practicum.event.model.State;
+import ru.practicum.event.model.dto.EventFullDto;
+import ru.practicum.event.model.dto.EventShortDto;
+import ru.practicum.event.model.dto.NewEventDto;
+import ru.practicum.request.model.Request;
+import ru.practicum.request.model.Status;
+import ru.practicum.request.model.dto.ParticipationRequestDto;
+import ru.practicum.users.model.User;
+import ru.practicum.users.model.dto.UserDto;
+import ru.practicum.users.model.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
