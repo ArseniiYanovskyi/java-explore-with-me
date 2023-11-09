@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -67,7 +68,8 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
                 .collect(Collectors.toList());
     }
 
-    @Override    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
+    @Override
+    public List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end) {
         if (uris.isEmpty()) {
             String sqlQueryWithoutUris = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
                     "FROM endpointhits " +
@@ -92,6 +94,20 @@ public class JDBCEndpointHitRepository implements EndpointHitRepository {
         return returningList.stream()
                 .sorted(Comparator.comparingInt(StatisticAnswerDto::getHits).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<StatisticAnswerDto> getStatisticByEndpoint(String url) {
+        final String query = "SELECT app, uri, COUNT(DISTINCT(ip)) AS hits " +
+                "FROM endpointhits " +
+                "WHERE uri LIKE ? " +
+                "GROUP BY uri, app";
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(query, (rs, rowNum) -> makeAnswer(rs), url));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+
     }
 
     private StatisticAnswerDto makeAnswer(ResultSet rs) {

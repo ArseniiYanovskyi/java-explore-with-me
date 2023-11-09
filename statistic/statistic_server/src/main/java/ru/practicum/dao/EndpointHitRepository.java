@@ -5,6 +5,7 @@ import ru.practicum.model.EndpointHit;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EndpointHitRepository {
 
@@ -14,4 +15,5 @@ public interface EndpointHitRepository {
 
     List<StatisticAnswerDto> getUniqueIpStatistic(List<String> uris, LocalDateTime start, LocalDateTime end);
 
+    Optional<StatisticAnswerDto> getStatisticByEndpoint(String url);
 }

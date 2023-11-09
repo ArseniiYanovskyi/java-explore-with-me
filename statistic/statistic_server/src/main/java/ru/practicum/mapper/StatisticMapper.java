@@ -4,6 +4,7 @@ import ru.practicum.dto.StatisticInfoDto;
 import ru.practicum.dto.StatisticRequestDto;
 import ru.practicum.model.EndpointHit;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,6 +14,9 @@ public class StatisticMapper {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static EndpointHit convertToEndpointHit(StatisticInfoDto statisticInfoDto) {
+        if (statisticInfoDto.getTimestamp() == null) {
+            statisticInfoDto.setTimestamp(Timestamp.valueOf(LocalDateTime.now().format(formatter)).toString());
+        }
         return EndpointHit.builder()
                 .app(statisticInfoDto.getApp())
                 .uri(statisticInfoDto.getUri())

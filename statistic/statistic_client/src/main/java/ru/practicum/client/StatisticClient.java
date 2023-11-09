@@ -35,6 +35,10 @@ public class StatisticClient {
         return makeAndSendRequest(HttpMethod.GET, "/stats", parameters, null);
     }
 
+    public ResponseEntity<Object> getUniqueStatisticByEventId(long eventId) {
+        return makeAndSendRequest(HttpMethod.GET, "/stats/" + eventId, null, null);
+    }
+
     private static ResponseEntity<Object> prepareStatisticResponse(ResponseEntity<Object> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
