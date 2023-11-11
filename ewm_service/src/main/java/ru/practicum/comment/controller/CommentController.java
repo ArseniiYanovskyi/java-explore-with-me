@@ -20,7 +20,7 @@ public class CommentController {
     @PostMapping("/users/{userId}/events/{eventId}/comments")
     @ResponseStatus(code = HttpStatus.CREATED)
     public CommentDto privateCreateComment(@PathVariable long userId, @PathVariable long eventId,
-                                    @RequestBody @Valid CommentDto commentDto) {
+                                           @RequestBody @Valid CommentDto commentDto) {
         log.info("Received request to add new comment for event {}  from user: {}.", eventId, userId);
         return commentService.privateCreateComment(userId, eventId, commentDto);
     }
@@ -28,7 +28,7 @@ public class CommentController {
     @PostMapping("/users/{userId}/comments/{commentId}/reply")
     @ResponseStatus(code = HttpStatus.CREATED)
     public CommentReplyDto privateCreateCommentReply(@PathVariable long userId, @PathVariable long commentId,
-                                          @RequestBody @Valid CommentReplyDto commentReplyDto) {
+                                                     @RequestBody @Valid CommentReplyDto commentReplyDto) {
         log.info("Received request to add new reply for comment {}  from user: {}.", commentId, userId);
         return commentService.privateCreateCommentReply(userId, commentId, commentReplyDto);
     }
@@ -44,7 +44,7 @@ public class CommentController {
     @PatchMapping("/users/{userId}/comments/reply/{commentReplyId}")
     @ResponseStatus(code = HttpStatus.OK)
     public CommentReplyDto privateEditCommentReply(@PathVariable long userId, @PathVariable long commentReplyId,
-                                         @RequestBody @Valid CommentReplyDto commentReplyDto) {
+                                                   @RequestBody @Valid CommentReplyDto commentReplyDto) {
         log.info("Received request to edit comment reply with id: {}.", commentReplyId);
         return commentService.privateEditCommentReply(userId, commentReplyId, commentReplyDto);
     }

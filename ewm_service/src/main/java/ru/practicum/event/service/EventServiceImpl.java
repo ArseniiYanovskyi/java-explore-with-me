@@ -1,6 +1,5 @@
 package ru.practicum.event.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -8,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.category.dao.CategoryRepository;
 import ru.practicum.category.model.Category;
-import ru.practicum.client.StatisticClient;
 import ru.practicum.event.dao.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
@@ -65,7 +63,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto privateUpdateEvent(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user "  + userId + " does not present in repository."));
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository."));
         if (event.getState().equals(State.PUBLISHED)) {
             throw new ConflictRequestException("Event already published, owner can't edit it anymore.");
         }
@@ -127,7 +125,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto privateGetEventById(long userId, long eventId) {
         log.info("Sending to repository request to get event with id {} by user {}.", eventId, userId);
         return utils.convertEventToFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user "  + userId + " does not present in repository.")));
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository.")));
     }
 
     @Override

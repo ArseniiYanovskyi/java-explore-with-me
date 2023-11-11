@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CommentServiceImpl implements CommentService{
+public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final CommentRepository commentRepository;
@@ -38,7 +38,7 @@ public class CommentServiceImpl implements CommentService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " does not present in repository."));
         Event event = eventRepository.findById(eventId)
-                        .orElseThrow(() -> new NotFoundException("User with id " + eventId + " does not present in repository."));
+                .orElseThrow(() -> new NotFoundException("User with id " + eventId + " does not present in repository."));
         if (event.getState().equals(State.PENDING)) {
             //возможность оставлять комментарии у публикатора события до его подтверждения/отклонения нахожу адекватным
             //к примеру, в формате "дополнительная информация" или "ответы на вероятные вопросы"

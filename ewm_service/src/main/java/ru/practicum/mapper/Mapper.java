@@ -101,8 +101,8 @@ public class Mapper {
                 .state(event.getState())
                 .comments(comments.stream()
                         .map(comment -> Mapper.convertCommentToDto(comment, replies.stream()
-                                        .filter(reply -> reply.getComment().getId() == comment.getId())
-                                        .collect(Collectors.toList())))
+                                .filter(reply -> reply.getComment().getId() == comment.getId())
+                                .collect(Collectors.toList())))
                         .collect(Collectors.toList()))
                 .views(views)
                 .build();

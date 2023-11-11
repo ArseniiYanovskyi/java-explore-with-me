@@ -10,11 +10,9 @@ import ru.practicum.comment.dao.CommentRepository;
 import ru.practicum.comment.model.Comment;
 import ru.practicum.comment.model.CommentReply;
 import ru.practicum.dto.StatisticAnswerDto;
-import ru.practicum.event.dao.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.dto.EventFullDto;
 import ru.practicum.event.model.dto.EventShortDto;
-import ru.practicum.exception.model.NotFoundException;
 import ru.practicum.mapper.Mapper;
 
 import java.util.List;
@@ -31,8 +29,8 @@ public class ServiceUtils {
     public EventFullDto convertEventToFullDto(Event event) {
         List<Comment> comments = commentRepository.findAllByEventId(event.getId());
         List<CommentReply> replies = commentReplyRepository.findAllByCommentIdIn(comments.stream()
-                        .map(Comment::getId)
-                        .collect(Collectors.toList()));
+                .map(Comment::getId)
+                .collect(Collectors.toList()));
         return Mapper.convertEventToFullDto(event, comments, replies, getUniqueViews(event.getId()));
     }
 

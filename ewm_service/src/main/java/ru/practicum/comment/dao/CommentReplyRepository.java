@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentReplyRepository extends JpaRepository<CommentReply, Long> {
-    public Optional<CommentReply> findByIdAndCommentatorId(long commentReplyId, long commentatorId);
-    public List<CommentReply> findAllByCommentId(long commentId);
-    public List<CommentReply> findAllByCommentIdIn(List<Long> commentsIds);
+    Optional<CommentReply> findByIdAndCommentatorId(long commentReplyId, long commentatorId);
+
+    List<CommentReply> findAllByCommentId(long commentId);
+
+    List<CommentReply> findAllByCommentIdIn(List<Long> commentsIds);
 }
