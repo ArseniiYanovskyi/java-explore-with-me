@@ -62,7 +62,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public EventRequestStatusUpdateResult privateUpdateOwnEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        Event event = utils.getEventWithOwnershipCheck(userId, eventId);
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user "  + userId + " does not present in repository."));
 
         List<Request> requests = new ArrayList<>();
         for (Long requesterId : eventRequestStatusUpdateRequest.getRequestIds()) {
@@ -103,9 +104,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public List<ParticipationRequestDto> privateGetOwnEventRequests(long userId, long eventId) {
-        Event event = utils.getEventWithOwnershipCheck(userId, eventId);
-        log.info("Sending to repository request to get event {} requests from event owner.", eventId);
-        return requestRepository.findAllByEventId(eventId).stream()
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user "  + userId + " does not present in repository."));
+        log.info("Sending to repository request to get event {} requests from event owner.", event.getId());
+        return requestRepository.findAllByEventId(event.getId()).stream()
                 .map(Mapper::createParticipationRequestDto)
                 .collect(Collectors.toList());
     }
