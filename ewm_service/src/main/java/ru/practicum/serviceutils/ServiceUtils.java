@@ -28,7 +28,7 @@ public class ServiceUtils {
 
     public EventFullDto convertEventToFullDto(Event event) {
         List<Comment> comments = commentRepository.findAllByEventId(event.getId());
-        List<CommentReply> replies = commentReplyRepository.findAllByCommentIdIn(comments.stream()
+        List<CommentReply> replies = commentReplyRepository.findAllByCommentIdInOrderByIdAsc(comments.stream()
                 .map(Comment::getId)
                 .collect(Collectors.toList()));
         return Mapper.convertEventToFullDto(event, comments, replies, getUniqueViews(event.getId()));

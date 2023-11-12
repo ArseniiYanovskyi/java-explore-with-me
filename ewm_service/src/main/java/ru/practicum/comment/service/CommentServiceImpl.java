@@ -78,7 +78,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentReplyDto privateEditCommentReply(long userId, long commentReplyId, CommentReplyDto commentReplyDto) {
-        CommentReply commentReply = commentReplyRepository.findByIdAndCommentatorId(commentReplyId, userId)
+        CommentReply commentReply = commentReplyRepository.findByIdAndCommentatorIdOrderByIdAsc(commentReplyId, userId)
                 .orElseThrow(() -> new NotFoundException("CommentReply with id: " + commentReplyId + " from user with id: " + userId + " does not present in repository."));
         commentReply.setText(commentReplyDto.getText());
         commentReply.setEdited(true);
@@ -147,14 +147,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void privateDeleteCommentReply(long userId, long commentReplyId) {
-        CommentReply commentReply = commentReplyRepository.findByIdAndCommentatorId(commentReplyId, userId)
+        CommentReply commentReply = commentReplyRepository.findByIdAndCommentatorIdOrderByIdAsc(commentReplyId, userId)
                 .orElseThrow(() -> new NotFoundException("CommentReply with id: " + commentReplyId + " from user with id: " + userId + " does not present in repository."));
         log.info("Sending to repository request to delete comment with id: {} (from commentator).", commentReply.getId());
         commentReplyRepository.deleteById(commentReply.getId());
     }
 
     private CommentDto convertCommentToDtoWithReplies(Comment comment) {
-        return Mapper.convertCommentToDto(comment, commentReplyRepository.findAllByCommentId(comment.getId()));
+        return Mapper.convertCommentToDto(comment, commentReplyRepository.findAllByCommentIdOrderByIdAsc(comment.getId()));
     }
 
     private Comment createComment(User user, Event event, CommentDto commentDto) {
