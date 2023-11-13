@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.utils.Mapper;
-import ru.practicum.utils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 import ru.practicum.users.model.User;
 import ru.practicum.users.model.dto.UserDto;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final ServiceUtils utils;
     private final UserRepository userRepository;
 
     @Override

@@ -15,7 +15,6 @@ import ru.practicum.request.model.Status;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateResult;
 import ru.practicum.request.model.dto.ParticipationRequestDto;
-import ru.practicum.utils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 
 import javax.transaction.Transactional;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestServiceImpl implements RequestService {
-    private final ServiceUtils utils;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
