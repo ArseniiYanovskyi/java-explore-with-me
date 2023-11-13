@@ -1,4 +1,4 @@
-package ru.practicum.mapper;
+package ru.practicum.utils;
 
 import ru.practicum.category.model.Category;
 import ru.practicum.category.model.dto.CategoryDto;

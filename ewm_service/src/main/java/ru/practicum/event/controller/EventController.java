@@ -8,7 +8,7 @@ import ru.practicum.client.StatisticClient;
 import ru.practicum.dto.StatisticInfoDto;
 import ru.practicum.event.model.dto.*;
 import ru.practicum.event.service.EventService;
-import ru.practicum.mapper.Mapper;
+import ru.practicum.utils.Mapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;

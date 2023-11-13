@@ -9,7 +9,7 @@ import ru.practicum.exception.model.ApiError;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
+import ru.practicum.utils.Mapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

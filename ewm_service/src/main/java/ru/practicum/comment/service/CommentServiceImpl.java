@@ -14,7 +14,7 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
+import ru.practicum.utils.Mapper;
 import ru.practicum.users.dao.UserRepository;
 import ru.practicum.users.model.User;
 

@@ -8,14 +8,14 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
+import ru.practicum.utils.Mapper;
 import ru.practicum.request.dao.RequestRepository;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.model.Status;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateResult;
 import ru.practicum.request.model.dto.ParticipationRequestDto;
-import ru.practicum.serviceutils.ServiceUtils;
+import ru.practicum.utils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 
 import javax.transaction.Transactional;

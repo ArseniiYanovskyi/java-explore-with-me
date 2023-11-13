@@ -14,8 +14,8 @@ import ru.practicum.event.model.dto.*;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
-import ru.practicum.serviceutils.ServiceUtils;
+import ru.practicum.utils.Mapper;
+import ru.practicum.utils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 import ru.practicum.users.model.User;
 

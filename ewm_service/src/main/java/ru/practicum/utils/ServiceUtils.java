@@ -1,4 +1,4 @@
-package ru.practicum.serviceutils;
+package ru.practicum.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,6 @@ import ru.practicum.dto.StatisticAnswerDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.dto.EventFullDto;
 import ru.practicum.event.model.dto.EventShortDto;
-import ru.practicum.mapper.Mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
