@@ -1,7 +1,11 @@
-package ru.practicum.mapper;
+package ru.practicum.utils;
 
 import ru.practicum.category.model.Category;
 import ru.practicum.category.model.dto.CategoryDto;
+import ru.practicum.comment.model.Comment;
+import ru.practicum.comment.model.CommentReply;
+import ru.practicum.comment.model.dto.CommentDto;
+import ru.practicum.comment.model.dto.CommentReplyDto;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.Location;
 import ru.practicum.event.model.State;
@@ -17,6 +21,8 @@ import ru.practicum.users.model.dto.UserShortDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Mapper {
     public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -76,11 +82,7 @@ public class Mapper {
                 .build();
     }
 
-    public static EventFullDto convertEventToFullDto(Event event, long views) {
-        String publishedTime = "";
-        if (event.getPublishedTime() != null) {
-            publishedTime = event.getPublishedTime().format(formatter);
-        }
+    public static EventFullDto convertEventToFullDto(Event event, List<Comment> comments, List<CommentReply> replies, long views) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -89,7 +91,7 @@ public class Mapper {
                 .category(convertCategoryToDto(event.getCategory()))
                 .initiator(convertUserToShortDto(event.getInitiator()))
                 .createdOn(event.getCreatedOn().format(formatter))
-                .publishedOn(publishedTime)
+                .publishedOn(event.getPublishedTime() == null ? null : event.getPublishedTime().format(formatter))
                 .eventDate(event.getEventDate().format(formatter))
                 .location(new Location(event.getLatitude(), event.getLongitude()))
                 .paid(event.isPaid())
@@ -97,6 +99,11 @@ public class Mapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .requestModeration(event.isRequestModeration())
                 .state(event.getState())
+                .comments(comments.stream()
+                        .map(comment -> Mapper.convertCommentToDto(comment, replies.stream()
+                                .filter(reply -> reply.getComment().getId() == comment.getId())
+                                .collect(Collectors.toList())))
+                        .collect(Collectors.toList()))
                 .views(views)
                 .build();
     }
@@ -131,6 +138,55 @@ public class Mapper {
                 .requester(request.getRequester().getId())
                 .created(request.getCreated().format(formatter))
                 .status(request.getStatus())
+                .build();
+    }
+
+    public static Comment createComment(User commentator, Event event, CommentDto commentDto) {
+        return Comment.builder()
+                .commentator(commentator)
+                .event(event)
+                .text(commentDto.getText())
+                .timestamp(LocalDateTime.now())
+                .edited(false)
+                .editedTime(null)
+                .build();
+    }
+
+    public static CommentDto convertCommentToDto(Comment comment, List<CommentReply> replies) {
+        return CommentDto.builder()
+                .id(comment.getId())
+                .commentatorId(comment.getCommentator().getId())
+                .eventId(comment.getEvent().getId())
+                .text(comment.getText())
+                .timestamp(comment.getTimestamp().format(formatter))
+                .replies(replies.stream()
+                        .map(Mapper::convertCommentReplyToDto)
+                        .collect(Collectors.toList()))
+                .edited(comment.isEdited())
+                .editedTime(comment.getEditedTime() == null ? null : comment.getEditedTime().format(formatter))
+                .build();
+    }
+
+    public static CommentReply createCommentReply(User commentator, Comment comment, CommentReplyDto commentReplyDto) {
+        return CommentReply.builder()
+                .commentator(commentator)
+                .comment(comment)
+                .text(commentReplyDto.getText())
+                .timestamp(LocalDateTime.now())
+                .edited(false)
+                .editedTime(null)
+                .build();
+    }
+
+    public static CommentReplyDto convertCommentReplyToDto(CommentReply commentReply) {
+        return CommentReplyDto.builder()
+                .id(commentReply.getId())
+                .commentatorId(commentReply.getCommentator().getId())
+                .commentId(commentReply.getComment().getId())
+                .text(commentReply.getText())
+                .timestamp(commentReply.getTimestamp().format(formatter))
+                .edited(commentReply.isEdited())
+                .editedTime(commentReply.getEditedTime() == null ? null : commentReply.getEditedTime().format(formatter))
                 .build();
     }
 }

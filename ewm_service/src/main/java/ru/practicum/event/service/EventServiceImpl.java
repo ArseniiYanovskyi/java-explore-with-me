@@ -14,8 +14,8 @@ import ru.practicum.event.model.dto.*;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
-import ru.practicum.serviceutils.ServiceUtils;
+import ru.practicum.utils.Mapper;
+import ru.practicum.utils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 import ru.practicum.users.model.User;
 
@@ -62,7 +62,8 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto privateUpdateEvent(long userId, long eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = utils.getEventWithOwnershipCheck(userId, eventId);
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository."));
         if (event.getState().equals(State.PUBLISHED)) {
             throw new ConflictRequestException("Event already published, owner can't edit it anymore.");
         }
@@ -123,7 +124,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto privateGetEventById(long userId, long eventId) {
         log.info("Sending to repository request to get event with id {} by user {}.", eventId, userId);
-        return utils.convertEventToFullDto(utils.getEventWithOwnershipCheck(userId, eventId));
+        return utils.convertEventToFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository.")));
     }
 
     @Override
@@ -195,6 +197,7 @@ public class EventServiceImpl implements EventService {
         }
         return Mapper.convertNewEventFromDto(newEventDto, initiator, eventCategory);
     }
+
 
     private void checkAnnotation(String annotation) {
         if (annotation == null) {

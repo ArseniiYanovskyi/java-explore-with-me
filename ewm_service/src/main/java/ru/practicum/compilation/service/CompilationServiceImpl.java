@@ -15,7 +15,7 @@ import ru.practicum.event.dao.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.exception.model.BadRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.serviceutils.ServiceUtils;
+import ru.practicum.utils.ServiceUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;

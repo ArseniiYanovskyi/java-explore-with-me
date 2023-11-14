@@ -5,18 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByCategoryId(long categoryId);
 
-    List<Event> findAllByInitiatorIdInAndStateInAndCategoryIdInAndEventDateBetween(List<Long> users, List<State> states, List<Long> categories, LocalDateTime start, LocalDateTime end);
-
-    List<Event> findAllByStateIsAndCategoryIdInAndEventDateBetween(State state, List<Long> categories, LocalDateTime start, LocalDateTime end);
-
-    List<Event> findAllByStateIsAndEventDateAfterAndCategoryIdIn(State state, LocalDateTime now, List<Long> categories);
+    Optional<Event> findByIdAndInitiatorId(long eventId, long initiatorId);
 
     Optional<Event> findByIdIsAndStateIs(long eventId, State state);
 

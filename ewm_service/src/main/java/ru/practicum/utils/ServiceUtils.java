@@ -1,36 +1,36 @@
-package ru.practicum.serviceutils;
+package ru.practicum.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.practicum.client.StatisticClient;
+import ru.practicum.comment.dao.CommentReplyRepository;
+import ru.practicum.comment.dao.CommentRepository;
+import ru.practicum.comment.model.Comment;
+import ru.practicum.comment.model.CommentReply;
 import ru.practicum.dto.StatisticAnswerDto;
-import ru.practicum.event.dao.EventRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.dto.EventFullDto;
 import ru.practicum.event.model.dto.EventShortDto;
-import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 public class ServiceUtils {
-    private final EventRepository eventRepository;
+    private final CommentRepository commentRepository;
+    private final CommentReplyRepository commentReplyRepository;
     private final StatisticClient statisticClient;
     private final ObjectMapper objectMapper;
 
-    public Event getEventWithOwnershipCheck(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " does not present in repository."));
-        if (event.getInitiator().getId() != userId) {
-            throw new NotFoundException("Event with id " + eventId + " does now belong to user id " + userId + ".");
-        }
-        return event;
-    }
-
     public EventFullDto convertEventToFullDto(Event event) {
-        return Mapper.convertEventToFullDto(event, getUniqueViews(event.getId()));
+        List<Comment> comments = commentRepository.findAllByEventId(event.getId());
+        List<CommentReply> replies = commentReplyRepository.findAllByCommentIdInOrderByIdAsc(comments.stream()
+                .map(Comment::getId)
+                .collect(Collectors.toList()));
+        return Mapper.convertEventToFullDto(event, comments, replies, getUniqueViews(event.getId()));
     }
 
     public EventShortDto convertEventToShortDto(Event event) {

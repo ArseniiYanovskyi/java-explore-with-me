@@ -11,8 +11,7 @@ import ru.practicum.category.model.dto.CategoryDto;
 import ru.practicum.event.dao.EventRepository;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
-import ru.practicum.serviceutils.ServiceUtils;
+import ru.practicum.utils.Mapper;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
-    private final ServiceUtils utils;
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
 

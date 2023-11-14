@@ -8,14 +8,13 @@ import ru.practicum.event.model.Event;
 import ru.practicum.event.model.State;
 import ru.practicum.exception.model.ConflictRequestException;
 import ru.practicum.exception.model.NotFoundException;
-import ru.practicum.mapper.Mapper;
+import ru.practicum.utils.Mapper;
 import ru.practicum.request.dao.RequestRepository;
 import ru.practicum.request.model.Request;
 import ru.practicum.request.model.Status;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.request.model.dto.EventRequestStatusUpdateResult;
 import ru.practicum.request.model.dto.ParticipationRequestDto;
-import ru.practicum.serviceutils.ServiceUtils;
 import ru.practicum.users.dao.UserRepository;
 
 import javax.transaction.Transactional;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestServiceImpl implements RequestService {
-    private final ServiceUtils utils;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
@@ -62,7 +60,8 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public EventRequestStatusUpdateResult privateUpdateOwnEventRequests(long userId, long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        Event event = utils.getEventWithOwnershipCheck(userId, eventId);
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository."));
 
         List<Request> requests = new ArrayList<>();
         for (Long requesterId : eventRequestStatusUpdateRequest.getRequestIds()) {
@@ -103,9 +102,10 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public List<ParticipationRequestDto> privateGetOwnEventRequests(long userId, long eventId) {
-        Event event = utils.getEventWithOwnershipCheck(userId, eventId);
-        log.info("Sending to repository request to get event {} requests from event owner.", eventId);
-        return requestRepository.findAllByEventId(eventId).stream()
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " from user " + userId + " does not present in repository."));
+        log.info("Sending to repository request to get event {} requests from event owner.", event.getId());
+        return requestRepository.findAllByEventId(event.getId()).stream()
                 .map(Mapper::createParticipationRequestDto)
                 .collect(Collectors.toList());
     }
